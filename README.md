@@ -22,20 +22,28 @@ Trapping the horse with any enclosure is straightforward, the challenge is doing
 Finding the optimal wall placement that maximizes enclosed area under a fixed wall budget is NP-Hard. The number of possible placements grows combinatorially with the size of the map exhaustively checking every combination of grass tiles quickly becomes computationally infeasible on any non-trivial map.
 
 ## Our Approach
+Rather than attempting to solve the problem directly over all grass tiles, we reduce 
+the search space before passing it to the solver.
 
-Rather than attempting to solve the problem directly over all grass tiles, we reduce the search space before passing it to the solver.
+The key insight is that **any valid enclosure must cut off every shortest path from 
+the border to the horse**. We use BFS outward from the horse to compute the shortest 
+distance from the horse to every reachable grass tile. We then filter the border tiles 
+down to only those that are reachable and have at least one inward grass neighbour, 
+and trace each of those back to the horse following strictly decreasing distances. 
+Every tile that appears on any of those traces is collected into a deduplicated vector.
 
-The key insight is that **any valid enclosure must cut off every shortest path from the border to the horse**. We use multi-source Dijkstra's algorithm to find all shortest paths from every border `0` tile to the horse, then collect every tile that appears on any of those paths into a deduplicated vector.
-
-This vector, rather than the full set of grass tiles is what gets fed into the solver. This reduces the effective `n` in the solver's complexity from the total number of grass tiles down to only the tiles that matter, making the solver tractable on maps where a brute force approach would not be.
+This vector, rather than the full set of grass tiles, is what gets fed into the solver. 
+This reduces the effective `n` in the solver's complexity from the total number of 
+grass tiles down to only the tiles that lie on a shortest path to the horse, making 
+the solver tractable on maps where a brute force approach would not be.
 
 ### Step by Step
 
-1. Every `0` tile on the border is treated as a source node
-2. Multi-source Dijkstra's runs simultaneously from all sources, following only `0` tiles
-3. All shortest paths to the horse are traced back
-4. Every tile appearing on any shortest path is collected into a vector with no duplicates
-5. That vector is handed to the solver as the candidate wall placements
+1. BFS runs outward from the horse across all reachable grass tiles, recording the distance from the horse to every reachable cell
+2. Every border grass tile is collected, then filtered down to only those that are reachable from the horse and have at least one inward grass neighbour
+3. Every valid border tile is traced backwards towards the horse by following strictly decreasing distance values
+4. Every tile touched during any trace is collected into a vector with no duplicates, shared state between traces ensures tiles shared by multiple paths are only counted once
+5. That vector is handed to the solver as the candidate wall placements, reducing the solver's input from all grass tiles down to only the tiles that lie on a shortest path to the horse
 
 ## Build and Run
 
