@@ -14,6 +14,8 @@ class Map {
   std::pair<int,int> horsePos() const;
 
   void display() const;
+  void displayPaths(const std::vector<std::pair<int,int>>& pathTiles) const;
+  int countGrass() const;
 
   private:
 

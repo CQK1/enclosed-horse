@@ -10,7 +10,7 @@ BUILD_DIR := build
 TARGET := d1 d2 d3
 
 # Common object files from src/ (excluding drivers)
-OBJS := $(BUILD_DIR)/Map.o $(BUILD_DIR)/Dijkstra.o
+OBJS := $(BUILD_DIR)/Map.o $(BUILD_DIR)/BFS.o
 
 # Default rule
 all: $(TARGET)

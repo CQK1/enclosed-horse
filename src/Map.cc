@@ -1,4 +1,5 @@
 #include "Map.h"
+#include <set>
 
 Map::Map(const std::vector<std::vector<int>>& grid) {
     _grid = grid;
@@ -36,11 +37,47 @@ std::pair<int,int> Map::horsePos() const {
 }
 
 void Map::display() const {
+    const std::string GREEN  = "\033[32m";
+    const std::string BLUE   = "\033[34m";
+    const std::string RED    = "\033[31m";
+    const std::string RESET  = "\033[0m";
+
     for (int r = 0; r < _rows; r++) {
         for (int c = 0; c < _cols; c++) {
-            std::cout << _grid[r][c] << " ";
+            if      (_grid[r][c] == 0) std::cout << GREEN << "0 " << RESET;
+            else if (_grid[r][c] == 1) std::cout << BLUE  << "1 " << RESET;
+            else if (_grid[r][c] == 2) std::cout << RED   << "2 " << RESET;
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
-    std::cout << std::endl;
+    std::cout << "\n";
+}
+
+void Map::displayPaths(const std::vector<std::pair<int,int>>& pathTiles) const {
+    const std::string GREEN  = "\033[32m";
+    const std::string GREY   = "\033[90m";
+    const std::string BLUE   = "\033[34m";
+    const std::string RED    = "\033[31m";
+    const std::string RESET  = "\033[0m";
+
+    std::set<std::pair<int,int>> pathSet(pathTiles.begin(), pathTiles.end());
+
+    for (int r = 0; r < _rows; r++) {
+        for (int c = 0; c < _cols; c++) {
+            if (_grid[r][c] == 1)      std::cout << BLUE  << "1 " << RESET;
+            else if (_grid[r][c] == 2) std::cout << RED   << "2 " << RESET;
+            else if (pathSet.count({r, c})) std::cout << GREEN << "0 " << RESET;
+            else                            std::cout << GREY  << "0 " << RESET;
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+}
+
+int Map::countGrass() const {
+    int count = 0;
+    for (int r = 0; r < _rows; r++)
+        for (int c = 0; c < _cols; c++)
+            if (_grid[r][c] == 0) count++;
+    return count;
 }

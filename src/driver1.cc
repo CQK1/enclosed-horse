@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Dijkstra.h"
+#include "BFS.h"
 #include "Map.h"
 
 int main() {
@@ -23,18 +23,24 @@ int main() {
     };
 
     Map m(data);
-    std::cout << "\nDRIVER 1:\n" << std::endl;
+    std::vector<std::pair<int,int>> tiles = findShortestPathTiles(m);
+    int G = m.countGrass();
+    int P = (int)tiles.size() - 1;
+    double exponentReduction = (1.0 - (double)P / G) * 100.0;
+
+    std::cout << "\nDRIVER 1: Before Optimization\n" << std::endl;
+    std::cout << "Tiles (n) that go into the solver = " << G << "\n\n";
     m.display();
 
-    std::vector<std::pair<int, int>> candidates = Dijkstra::findCandiateWalls(m);
+    std::cout << "\nDRIVER 1: After Optimization\n" << std::endl;
+    std::cout << "Tiles (n) that go into the solver = " << P << "\n\n";
+    m.displayPaths(tiles);
 
-    std::cout << "After the operation, there are " << candidates.size() << " candidate walls" << std::endl;
-    std::cout << "\nCells that are on any of the shortest paths:" << std::endl;
-    
-    for (auto p : candidates) {
-        std::cout << "(" << p.first << ", " << p.second << ") ";
-    }
-    std::cout << "\n" << std::endl;
+    std::cout << "As the solver's time complexity is O(2^n).\n"
+	         "Our original amount of operations was 2^" << G <<
+	         ".\nNow our amount of operations is 2^" << P <<
+	         ".\nThis is a " << exponentReduction <<
+	         "% reduction in the solver's search space exponent.\n\n";
 
     return 0;
 }
